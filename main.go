@@ -9,15 +9,33 @@ import (
 )
 
 func main() {
-	best, err := loadPlugin("build/plugins/bestapi.so")
+	// mathapi api
+	mathapi, err := loadPlugin("build/plugins/mathapi.so")
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	best.Initialize()
-	res, err := best.CallMethod("whatever", nil)
-	fmt.Println(string(res))
+	var first uint64 = 123
+	firstBytes := make([]byte, 8)
+	binary.BigEndian.PutUint64(firstBytes, first)
+	var second uint64 = 123
+	secondBytes := make([]byte, 8)
+	binary.BigEndian.PutUint64(secondBytes, second)
+
+	res, err := mathapi.CallMethod("Add_Numbers", firstBytes, secondBytes)
+	fmt.Println("Add_Numbers:", binary.BigEndian.Uint64(res))
+
+	// // bestapi (doesn't work)
+	// best, err := loadPlugin("build/plugins/bestapi.so")
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	return
+	// }
+
+	// best.Initialize()
+	// res, err = best.CallMethod("whatever", nil)
+	// fmt.Println(string(res))
 
 	// goerli
 	goerli, err := loadPlugin("build/plugins/goerli.so")

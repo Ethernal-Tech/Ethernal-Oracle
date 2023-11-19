@@ -10,6 +10,7 @@ build_plugins:
 	@echo "Building plugins..."
 	@cd plugins/bestapi && go build -buildmode=plugin -o ../../build/plugins/bestapi.so
 	@cd plugins/goerli && go build -buildmode=plugin -o ../../build/plugins/goerli.so
+	@cd plugins/mathapi && go build -buildmode=plugin -o ../../build/plugins/mathapi.so
 
 build_oracle:
 	@echo "Building main project..."
