@@ -2,5 +2,5 @@ package plugins
 
 type IPlugin interface {
 	Initialize()
-	CallMethod(methodName string) string
+	CallMethod(methodName string, paramBytes ...[]byte) ([]byte, error)
 }

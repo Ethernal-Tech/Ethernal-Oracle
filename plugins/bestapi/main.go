@@ -6,8 +6,8 @@ func (b *BestApi) Initialize() {
 
 }
 
-func (b *BestApi) CallMethod(methodName string) string {
-	return "Hello from BestAPI"
+func (b *BestApi) CallMethod(methodName string, paramBytes ...[]byte) ([]byte, error) {
+	return []byte("Hello from BestAPI"), nil
 }
 
 func main() {}
