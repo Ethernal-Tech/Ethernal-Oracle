@@ -1,26 +1,35 @@
 .PHONY: all clean
 
+BUILD_DIR := ./build
+PLUGIN_DIR := ./build/plugins
+
 all: build
 
 go: build run
 
-build: build_plugins build_oracle
-
-build_plugins:
-	@echo "Building plugins..."
-	@cd plugins/bestapi && go build -buildmode=plugin -o ../../build/plugins/bestapi.so
-	@cd plugins/goerli && go build -buildmode=plugin -o ../../build/plugins/goerli.so
-	@cd plugins/mathapi && go build -buildmode=plugin -o ../../build/plugins/mathapi.so
-
-build_oracle:
-	@echo "Building main project..."
-	@go build -o build/oracle
-
-clean:
-	@echo "Cleaning up..."
-	@rm -rf build/plugins/*.so
-	@rm -rf build/oracle
+build: build_plugins build_oracle copy_env
 
 run:
 	@echo "Starting Oracle"
-	@./build/oracle
+	@$(BUILD_DIR)/oracle
+
+
+build_plugins:
+	@echo "Building plugins..."
+	@go build -buildmode=plugin -o $(PLUGIN_DIR)/bestapi.so plugins/bestapi/main.go
+	@go build -buildmode=plugin -o $(PLUGIN_DIR)/goerli.so plugins/goerli/main.go
+	@go build -buildmode=plugin -o $(PLUGIN_DIR)/mathapi.so plugins/mathapi/main.go
+	@go build -buildmode=plugin -o $(PLUGIN_DIR)/exchangerateapi.so plugins/exchangerateapi/main.go
+
+build_oracle:
+	@echo "Building main project..."
+	@go build -o $(BUILD_DIR)/oracle
+
+copy_env:
+	@cp .env $(BUILD_DIR)
+
+clean:
+	@echo "Cleaning up..."
+	@rm -rf $(PLUGIN_DIR)/*.so
+	@rm -rf $(BUILD_DIR)/oracle
+	@rm -rf $(BUILD_DIR)/.env

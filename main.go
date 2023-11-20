@@ -26,6 +26,21 @@ func main() {
 	res, err := mathapi.CallMethod("Add_Numbers", firstBytes, secondBytes)
 	fmt.Println("Add_Numbers:", binary.BigEndian.Uint64(res))
 
+	// exchangerate api
+	exchange, err := loadPlugin("build/plugins/exchangerateapi.so")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	exchange.Initialize()
+	res, err = exchange.CallMethod("Exhange_Rate", []byte("USD"), []byte("EUR"))
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	// fmt.Println("Exhange_Rate:", string(res))
+
 	// // bestapi (doesn't work)
 	// best, err := loadPlugin("build/plugins/bestapi.so")
 	// if err != nil {
@@ -50,7 +65,7 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-	fmt.Println("Eth_blockNumber: ", binary.BigEndian.Uint64(res))
+	// fmt.Println("Eth_blockNumber: ", binary.BigEndian.Uint64(res))
 
 	blockNumberBytes := big.NewInt(1000000).Bytes()
 	res, err = goerli.CallMethod("Eth_getBlockByNumber", blockNumberBytes)
@@ -58,7 +73,7 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-	fmt.Println("Eth_getBlockByNumber: ", res)
+	// fmt.Println("Eth_getBlockByNumber: ", res)
 }
 
 func loadPlugin(path string) (plugins.IPlugin, error) {
