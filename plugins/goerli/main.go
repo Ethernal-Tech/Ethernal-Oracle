@@ -7,9 +7,11 @@ import (
 	"fmt"
 	"log"
 	"math/big"
+	"os"
 	"reflect"
 
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/joho/godotenv"
 )
 
 type BlockInfo struct {
@@ -33,7 +35,12 @@ type Goerli struct {
 }
 
 func (g *Goerli) Initialize() {
-	g.address = "http://explorer.ethernal.tech:8545"
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	g.address = os.Getenv("GOERLI_NODE_URL")
 }
 
 func (g *Goerli) CallMethod(methodName string, paramBytes ...[]byte) ([]byte, error) {
