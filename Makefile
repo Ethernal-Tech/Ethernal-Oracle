@@ -2,6 +2,8 @@
 
 BUILD_DIR := ./build
 PLUGIN_DIR := ./build/plugins
+PLUGINS_SRC := $(wildcard plugins/*/main.go)
+PLUGINS := $(patsubst plugins/%/main.go,%,$(PLUGINS_SRC))
 
 all: build
 
@@ -10,22 +12,21 @@ go: build run
 build: build_plugins build_oracle copy_env
 
 run:
-	@echo "Starting Oracle"
+	@echo "Starting Oracle..."
 	@$(BUILD_DIR)/oracle
 
+build_plugins: $(addprefix build_plugin_, $(PLUGINS))
 
-build_plugins:
-	@echo "Building plugins..."
-	@go build -buildmode=plugin -o $(PLUGIN_DIR)/bestapi.so plugins/bestapi/main.go
-	@go build -buildmode=plugin -o $(PLUGIN_DIR)/goerli.so plugins/goerli/main.go
-	@go build -buildmode=plugin -o $(PLUGIN_DIR)/mathapi.so plugins/mathapi/main.go
-	@go build -buildmode=plugin -o $(PLUGIN_DIR)/exchangerateapi.so plugins/exchangerateapi/main.go
+build_plugin_%:
+	@echo "Building $*..."
+	@go build -buildmode=plugin -o $(PLUGIN_DIR)/$*.so plugins/$*/main.go
 
 build_oracle:
-	@echo "Building main project..."
+	@echo "Building oracle..."
 	@go build -o $(BUILD_DIR)/oracle
 
 copy_env:
+	@echo "Copying .env..."
 	@cp .env $(BUILD_DIR)
 
 clean:
