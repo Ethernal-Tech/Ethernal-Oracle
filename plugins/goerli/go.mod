@@ -2,7 +2,10 @@ module goerli
 
 go 1.21.4
 
-require github.com/ethereum/go-ethereum v1.13.5
+require (
+	github.com/ethereum/go-ethereum v1.13.5
+	github.com/joho/godotenv v1.5.1
+)
 
 require (
 	github.com/DataDog/zstd v1.5.2 // indirect
@@ -23,7 +26,6 @@ require (
 	github.com/go-stack/stack v1.8.1 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/holiman/uint256 v1.2.3 // indirect
-	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/mmcloughlin/addchain v0.4.0 // indirect
 	github.com/prometheus/client_golang v1.14.0 // indirect

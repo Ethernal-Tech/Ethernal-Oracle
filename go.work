@@ -1,0 +1,10 @@
+go 1.21.4
+
+use (
+	.
+	./plugins/bestapi
+	./plugins/bet365
+	./plugins/exchangerateapi
+	./plugins/goerli
+	./plugins/mathapi
+)
