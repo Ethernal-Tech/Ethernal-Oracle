@@ -39,7 +39,52 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-	// fmt.Println("Exhange_Rate:", string(res))
+	fmt.Println("Exhange_Rate:", string(res))
+
+	// currencyexhange api
+	exchange2, err := loadPlugin("build/plugins/currencyexchangeapi.so")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	exchange2.Initialize()
+	res, err = exchange2.CallMethod("Exhange_Rate", []byte("USD"), []byte("EUR"))
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println("Exhange_Rate:", string(res))
+
+	// currencyconversion api
+	exchange3, err := loadPlugin("build/plugins/currencyconversionapi.so")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	exchange3.Initialize()
+	res, err = exchange3.CallMethod("Exhange_Rate", []byte("USD"), []byte("EUR"))
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println("Exhange_Rate:", string(res))
+
+	// livescore api
+	sportsdb, err := loadPlugin("build/plugins/livescore.so")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	sportsdb.Initialize()
+	res, err = sportsdb.CallMethod("Get_All_Leagues")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	// fmt.Println("Get_All_Leagues:", string(res))
 
 	// // bestapi (doesn't work)
 	// best, err := loadPlugin("build/plugins/bestapi.so")

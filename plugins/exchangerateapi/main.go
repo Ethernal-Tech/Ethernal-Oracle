@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"reflect"
+	"strconv"
 	"strings"
 
 	"github.com/joho/godotenv"
@@ -36,8 +37,8 @@ func (e *ExhangeRateApi) Initialize() {
 		log.Fatal("Error loading .env file")
 	}
 
-	e.address = os.Getenv("EXCHANGE_RATE_API_ADDRESS")
-	e.api_key = os.Getenv("EXCHANGE_RATE_API_API_KEY")
+	e.address = os.Getenv("EXCHANGE_RATE_ADDRESS")
+	e.api_key = os.Getenv("EXCHANGE_RATE_API_KEY")
 }
 
 func (e *ExhangeRateApi) CallMethod(methodName string, paramBytes ...[]byte) ([]byte, error) {
@@ -87,10 +88,9 @@ func (e *ExhangeRateApi) Exhange_Rate(first []byte, second []byte) ([]byte, erro
 		return nil, fmt.Errorf("Error decoding JSON: %s", err)
 	}
 
-	rate := rates.ConversionRates[targetCurrency]
-	result := fmt.Sprintf("1 %s = %.2f %s\n", baseCurrency, rate, targetCurrency)
+	floatString := strconv.FormatFloat(rates.ConversionRates[targetCurrency], 'f', -1, 64)
 
-	return []byte(result), nil
+	return []byte(floatString), nil
 }
 
 func main() {}

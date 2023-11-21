@@ -6,5 +6,6 @@ use (
 	./plugins/bet365
 	./plugins/exchangerateapi
 	./plugins/goerli
+	./plugins/livescore
 	./plugins/mathapi
 )
