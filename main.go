@@ -26,8 +26,8 @@ func main() {
 	res, err := mathapi.CallMethod("Add_Numbers", firstBytes, secondBytes)
 	fmt.Println("Add_Numbers:", binary.BigEndian.Uint64(res))
 
-	// exchangerate api
-	exchange, err := loadPlugin("build/plugins/exchangerateapi.so")
+	// combined api
+	exchange, err := loadPlugin("build/plugins/combinedexhcnagerate.so")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -35,36 +35,6 @@ func main() {
 
 	exchange.Initialize()
 	res, err = exchange.CallMethod("Exhange_Rate", []byte("USD"), []byte("EUR"))
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	fmt.Println("Exhange_Rate:", string(res))
-
-	// currencyexhange api
-	exchange2, err := loadPlugin("build/plugins/currencyexchangeapi.so")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	exchange2.Initialize()
-	res, err = exchange2.CallMethod("Exhange_Rate", []byte("USD"), []byte("EUR"))
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	fmt.Println("Exhange_Rate:", string(res))
-
-	// currencyconversion api
-	exchange3, err := loadPlugin("build/plugins/currencyconversionapi.so")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	exchange3.Initialize()
-	res, err = exchange3.CallMethod("Exhange_Rate", []byte("USD"), []byte("EUR"))
 	if err != nil {
 		fmt.Println(err)
 		return

@@ -4,6 +4,9 @@ use (
 	.
 	./plugins/bestapi
 	./plugins/bet365
+	./plugins/combinedexhcnagerate
+	./plugins/currencyconversionapi
+	./plugins/currencyexchangeapi
 	./plugins/exchangerateapi
 	./plugins/goerli
 	./plugins/livescore
