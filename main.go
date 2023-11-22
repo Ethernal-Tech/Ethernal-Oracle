@@ -39,7 +39,7 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-	fmt.Println("Exhange_Rate:", string(res))
+	// fmt.Println("Exhange_Rate:", string(res))
 
 	// livescore api
 	sportsdb, err := loadPlugin("build/plugins/livescore.so")
@@ -56,16 +56,20 @@ func main() {
 	}
 	// fmt.Println("Get_All_Leagues:", string(res))
 
-	// // bestapi (doesn't work)
-	// best, err := loadPlugin("build/plugins/bestapi.so")
-	// if err != nil {
-	// 	fmt.Println(err)
-	// 	return
-	// }
+	// livescore api
+	bet365, err := loadPlugin("build/plugins/bet365.so")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
-	// best.Initialize()
-	// res, err = best.CallMethod("whatever", nil)
-	// fmt.Println(string(res))
+	bet365.Initialize()
+	res, err = bet365.CallMethod("Get_Premier_League_Quotas")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	// fmt.Println("Get_All_Leagues:", string(res))
 
 	// goerli
 	goerli, err := loadPlugin("build/plugins/goerli.so")
