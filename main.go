@@ -9,6 +9,23 @@ import (
 )
 
 func main() {
+	// combined api
+	exchange, err := loadPlugin("build/plugins/combinedexhcnagerate.so")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	exchange.Initialize()
+	methods := exchange.GetMethods()
+	fmt.Println(methods)
+	res, err := exchange.CallMethod("Exhange_Rate", []byte("USD"), []byte("EUR"))
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	// fmt.Println("Exhange_Rate:", string(res))
+
 	// mathapi api
 	mathapi, err := loadPlugin("build/plugins/mathapi.so")
 	if err != nil {
@@ -23,23 +40,8 @@ func main() {
 	secondBytes := make([]byte, 8)
 	binary.BigEndian.PutUint64(secondBytes, second)
 
-	res, err := mathapi.CallMethod("Add_Numbers", firstBytes, secondBytes)
+	res, err = mathapi.CallMethod("Add_Numbers", firstBytes, secondBytes)
 	fmt.Println("Add_Numbers:", binary.BigEndian.Uint64(res))
-
-	// combined api
-	exchange, err := loadPlugin("build/plugins/combinedexhcnagerate.so")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	exchange.Initialize()
-	res, err = exchange.CallMethod("Exhange_Rate", []byte("USD"), []byte("EUR"))
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	// fmt.Println("Exhange_Rate:", string(res))
 
 	// livescore api
 	sportsdb, err := loadPlugin("build/plugins/livescore.so")
@@ -69,7 +71,7 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-	// fmt.Println("Get_All_Leagues:", string(res))
+	fmt.Println("Get_Premiere_League_Quotas:", string(res))
 
 	// goerli
 	goerli, err := loadPlugin("build/plugins/goerli.so")

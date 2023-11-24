@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"oracle-test/plugins"
 	"os"
 	"reflect"
 
@@ -24,6 +25,45 @@ func (e *CurrencyExchangeApi) Initialize() {
 
 	e.address = os.Getenv("CURRENCY_EXCHANGE_ADDRESS")
 	e.api_key = os.Getenv("CURRENCY_EXCHANGE_API_KEY")
+}
+
+func (e *CurrencyExchangeApi) GetMethods() []plugins.Method {
+	structType := reflect.TypeOf(e)
+
+	numMethods := structType.NumMethod()
+	methodCount := 0
+	var methods = make([]plugins.Method, numMethods-3)
+	for i := 0; i < numMethods; i++ {
+		method := structType.Method(i)
+
+		if method.Name == "Initialize" ||
+			method.Name == "GetMethods" ||
+			method.Name == "CallMethod" {
+			continue
+		}
+
+		var newMethod = plugins.Method{}
+		newMethod.MethodName = method.Name
+
+		numParams := method.Type.NumIn()
+		var inputParams = make([]plugins.Param, numParams)
+		for j := 0; j < numParams; j++ {
+			inputParams[j].ParamType = method.Type.In(j).String()
+		}
+
+		numOut := method.Type.NumOut()
+		var outputParams = make([]plugins.Param, numOut)
+		for j := 0; j < numOut; j++ {
+			outputParams[j].ParamType = method.Type.Out(j).String()
+		}
+
+		newMethod.InputParams = inputParams
+		newMethod.OutputParams = outputParams
+		methods[methodCount] = newMethod
+		methodCount++
+	}
+
+	return methods
 }
 
 func (e *CurrencyExchangeApi) CallMethod(methodName string, paramBytes ...[]byte) ([]byte, error) {

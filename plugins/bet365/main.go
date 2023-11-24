@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"oracle-test/plugins"
 	"os"
 	"reflect"
 
@@ -95,6 +96,10 @@ type Quotas struct {
 	TotalUnder45   interface{} `json:"total_under_45"`
 }
 
+type ErrorMessage struct {
+	Message string `json:"message"`
+}
+
 type LiveScore struct {
 	api_key string
 	address string
@@ -108,6 +113,45 @@ func (s *LiveScore) Initialize() {
 
 	s.address = os.Getenv("BET365_ADDRESS")
 	s.api_key = os.Getenv("BET365_API_KEY")
+}
+
+func (s *LiveScore) GetMethods() []plugins.Method {
+	structType := reflect.TypeOf(s)
+
+	numMethods := structType.NumMethod()
+	methodCount := 0
+	var methods = make([]plugins.Method, numMethods-3)
+	for i := 0; i < numMethods; i++ {
+		method := structType.Method(i)
+
+		if method.Name == "Initialize" ||
+			method.Name == "GetMethods" ||
+			method.Name == "CallMethod" {
+			continue
+		}
+
+		var newMethod = plugins.Method{}
+		newMethod.MethodName = method.Name
+
+		numParams := method.Type.NumIn()
+		var inputParams = make([]plugins.Param, numParams)
+		for j := 0; j < numParams; j++ {
+			inputParams[j].ParamType = method.Type.In(j).String()
+		}
+
+		numOut := method.Type.NumOut()
+		var outputParams = make([]plugins.Param, numOut)
+		for j := 0; j < numOut; j++ {
+			outputParams[j].ParamType = method.Type.Out(j).String()
+		}
+
+		newMethod.InputParams = inputParams
+		newMethod.OutputParams = outputParams
+		methods[methodCount] = newMethod
+		methodCount++
+	}
+
+	return methods
 }
 
 func (s *LiveScore) CallMethod(methodName string, paramBytes ...[]byte) ([]byte, error) {
@@ -153,6 +197,11 @@ func (s *LiveScore) Get_Premier_League_Quotas() ([]byte, error) {
 	var matches map[int32]Match
 	err = json.Unmarshal(body, &matches)
 	if err != nil {
+		var errorMsg ErrorMessage
+		err = json.Unmarshal(body, &errorMsg)
+		if err == nil {
+			return nil, fmt.Errorf(errorMsg.Message)
+		}
 		return nil, fmt.Errorf("Error decoding JSON: %s", err)
 	}
 
