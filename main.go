@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"math/big"
 	"oracle-test/plugins"
 	"plugin"
 )
@@ -16,10 +15,9 @@ func main() {
 		return
 	}
 
-	var first uint64 = 123
-	var second uint64 = 123
-
-	res, err := mathapi.CallMethod("Add_Numbers", first, second)
+	mathapi.Initialize()
+	fmt.Println(mathapi.GetMethods())
+	res, err := mathapi.CallMethod("Add_Numbers", uint64(123), uint64(123))
 	fmt.Println("Add_Numbers:", res.(uint64))
 
 	// combined api
@@ -30,13 +28,12 @@ func main() {
 	}
 
 	exchange.Initialize()
-	methods := exchange.GetMethods()
-	fmt.Println(methods)
-	res, err = exchange.CallMethod("Exhange_Rate", "USD", "EUR")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+	fmt.Println(exchange.GetMethods())
+	// res, err = exchange.CallMethod("Exhange_Rate", "USD", "EUR")
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	return
+	// }
 	// fmt.Println("Exhange_Rate:", res)
 
 	// livescore api
@@ -47,11 +44,12 @@ func main() {
 	}
 
 	sportsdb.Initialize()
-	res, err = sportsdb.CallMethod("Get_All_Leagues")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+	fmt.Println(sportsdb.GetMethods())
+	// res, err = sportsdb.CallMethod("Get_All_Leagues")
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	return
+	// }
 	// fmt.Println("Get_All_Leagues:", res)
 
 	// bet365 api
@@ -62,12 +60,13 @@ func main() {
 	}
 
 	bet365.Initialize()
-	res, err = bet365.CallMethod("Get_Premier_League_Quotas")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	fmt.Println("Get_Premiere_League_Quotas:", res)
+	fmt.Println(bet365.GetMethods())
+	// res, err = bet365.CallMethod("Get_Premier_League_Quotas")
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	return
+	// }
+	// fmt.Println("Get_Premiere_League_Quotas:", res)
 
 	// goerli
 	goerli, err := loadPlugin("build/plugins/goerli.so")
@@ -77,20 +76,21 @@ func main() {
 	}
 
 	goerli.Initialize()
-	res, err = goerli.CallMethod("Eth_blockNumber")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	fmt.Println("Eth_blockNumber: ", res)
+	fmt.Println(goerli.GetMethods())
+	// res, err = goerli.CallMethod("Eth_blockNumber")
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	return
+	// }
+	// fmt.Println("Eth_blockNumber: ", res)
 
-	blockNumberBytes := big.NewInt(1000000).Bytes()
-	res, err = goerli.CallMethod("Eth_getBlockByNumber", blockNumberBytes)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	fmt.Println("Eth_getBlockByNumber: ", res)
+	// blockNumberBytes := big.NewInt(1000000).Bytes()
+	// res, err = goerli.CallMethod("Eth_getBlockByNumber", blockNumberBytes)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	return
+	// }
+	// fmt.Println("Eth_getBlockByNumber: ", res)
 }
 
 func loadPlugin(path string) (plugins.IPlugin, error) {
