@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/binary"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -83,19 +82,19 @@ func (g *Goerli) GetMethods() []plugins.Method {
 	return methods
 }
 
-func (g *Goerli) CallMethod(methodName string, paramBytes ...[]byte) ([]byte, error) {
+func (g *Goerli) CallMethod(methodName string, params ...interface{}) (interface{}, error) {
 	methodValue := reflect.ValueOf(g).MethodByName(methodName)
 
 	if methodValue.IsValid() {
 		var methodParams []reflect.Value
-		for _, param := range paramBytes {
+		for _, param := range params {
 			methodParams = append(methodParams, reflect.ValueOf(param))
 		}
 
 		result := methodValue.Call(methodParams)
 
 		if len(result) > 0 {
-			value, _ := result[0].Interface().([]uint8)
+			value, _ := result[0].Interface().(interface{})
 			err, _ := result[1].Interface().(error)
 			return value, err
 		}
@@ -105,22 +104,20 @@ func (g *Goerli) CallMethod(methodName string, paramBytes ...[]byte) ([]byte, er
 	return nil, fmt.Errorf("Method %s not found", methodName)
 }
 
-func (g *Goerli) Eth_blockNumber() ([]byte, error) {
+func (g *Goerli) Eth_blockNumber() (uint64, error) {
 	client, err := ethclient.Dial(g.address)
 	if err != nil {
 		log.Fatal(err)
-		return nil, err
+		return 0, err
 	}
 
 	blockNumber, err := client.BlockNumber(context.Background())
 	if err != nil {
 		log.Fatal(err)
-		return nil, err
+		return 0, err
 	}
 
-	bytes := make([]byte, 8)
-	binary.BigEndian.PutUint64(bytes, blockNumber)
-	return bytes, nil
+	return blockNumber, nil
 }
 
 func (g *Goerli) Eth_getBlockByNumber(params []byte) ([]byte, error) {

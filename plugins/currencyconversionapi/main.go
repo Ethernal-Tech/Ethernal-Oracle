@@ -9,7 +9,6 @@ import (
 	"oracle-test/plugins"
 	"os"
 	"reflect"
-	"strconv"
 
 	"github.com/joho/godotenv"
 )
@@ -87,19 +86,19 @@ func (e *CurrencyConversionApi) GetMethods() []plugins.Method {
 	return methods
 }
 
-func (e *CurrencyConversionApi) CallMethod(methodName string, paramBytes ...[]byte) ([]byte, error) {
+func (e *CurrencyConversionApi) CallMethod(methodName string, params ...interface{}) (interface{}, error) {
 	methodValue := reflect.ValueOf(e).MethodByName(methodName)
 
 	if methodValue.IsValid() {
 		var methodParams []reflect.Value
-		for _, param := range paramBytes {
+		for _, param := range params {
 			methodParams = append(methodParams, reflect.ValueOf(param))
 		}
 
 		result := methodValue.Call(methodParams)
 
 		if len(result) > 0 {
-			value, _ := result[0].Interface().([]uint8)
+			value, _ := result[0].Interface().(interface{})
 			err, _ := result[1].Interface().(error)
 			return value, err
 		}
@@ -109,11 +108,8 @@ func (e *CurrencyConversionApi) CallMethod(methodName string, paramBytes ...[]by
 	return nil, fmt.Errorf("Method %s not found", methodName)
 }
 
-func (e *CurrencyConversionApi) Exhange_Rate(first []byte, second []byte) ([]byte, error) {
-	baseCurrency := string(first)
-	targetCurrency := string(second)
-
-	apiUrl := e.address + fmt.Sprintf("convert?from=%s&to=%s&amount=1.0", baseCurrency, targetCurrency)
+func (e *CurrencyConversionApi) Exhange_Rate(base string, target string) (float64, error) {
+	apiUrl := e.address + fmt.Sprintf("convert?from=%s&to=%s&amount=1.0", base, target)
 
 	request, err := http.NewRequest("GET", apiUrl, nil)
 	request.Header.Add("X-RapidAPI-Key", e.api_key)
@@ -121,24 +117,22 @@ func (e *CurrencyConversionApi) Exhange_Rate(first []byte, second []byte) ([]byt
 
 	response, err := http.DefaultClient.Do(request)
 	if err != nil {
-		return nil, fmt.Errorf("Error making request: %s", err)
+		return 0, fmt.Errorf("Error making request: %s", err)
 	}
 	defer response.Body.Close()
 
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
-		return nil, fmt.Errorf("Error making request: %s", err)
+		return 0, fmt.Errorf("Error making request: %s", err)
 	}
 
 	var rate ConvertRateResponse
 	err = json.Unmarshal(body, &rate)
 	if err != nil {
-		return nil, fmt.Errorf("Error decoding JSON: %s", err)
+		return 0, fmt.Errorf("Error decoding JSON: %s", err)
 	}
 
-	floatString := strconv.FormatFloat(rate.Result, 'f', -1, 64)
-
-	return []byte(floatString), nil
+	return rate.Result, nil
 }
 
 func main() {}

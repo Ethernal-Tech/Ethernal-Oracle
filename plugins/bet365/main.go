@@ -154,19 +154,19 @@ func (s *LiveScore) GetMethods() []plugins.Method {
 	return methods
 }
 
-func (s *LiveScore) CallMethod(methodName string, paramBytes ...[]byte) ([]byte, error) {
+func (s *LiveScore) CallMethod(methodName string, params ...interface{}) (interface{}, error) {
 	methodValue := reflect.ValueOf(s).MethodByName(methodName)
 
 	if methodValue.IsValid() {
 		var methodParams []reflect.Value
-		for _, param := range paramBytes {
+		for _, param := range params {
 			methodParams = append(methodParams, reflect.ValueOf(param))
 		}
 
 		result := methodValue.Call(methodParams)
 
 		if len(result) > 0 {
-			value, _ := result[0].Interface().([]uint8)
+			value, _ := result[0].Interface().(interface{})
 			err, _ := result[1].Interface().(error)
 			return value, err
 		}

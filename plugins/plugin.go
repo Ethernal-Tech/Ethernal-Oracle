@@ -14,5 +14,5 @@ type Param struct {
 type IPlugin interface {
 	Initialize()
 	GetMethods() []Method
-	CallMethod(methodName string, paramBytes ...[]byte) ([]byte, error)
+	CallMethod(methodName string, params ...interface{}) (interface{}, error)
 }

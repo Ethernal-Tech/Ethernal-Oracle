@@ -5,7 +5,6 @@ import (
 	"oracle-test/plugins"
 	"plugin"
 	"reflect"
-	"strconv"
 )
 
 type CombinedExchange struct {
@@ -79,19 +78,19 @@ func (c *CombinedExchange) GetMethods() []plugins.Method {
 	return methods
 }
 
-func (c *CombinedExchange) CallMethod(methodName string, paramBytes ...[]byte) ([]byte, error) {
+func (c *CombinedExchange) CallMethod(methodName string, params ...interface{}) (interface{}, error) {
 	methodValue := reflect.ValueOf(c).MethodByName(methodName)
 
 	if methodValue.IsValid() {
 		var methodParams []reflect.Value
-		for _, param := range paramBytes {
+		for _, param := range params {
 			methodParams = append(methodParams, reflect.ValueOf(param))
 		}
 
 		result := methodValue.Call(methodParams)
 
 		if len(result) > 0 {
-			value, _ := result[0].Interface().([]uint8)
+			value, _ := result[0].Interface().(interface{})
 			err, _ := result[1].Interface().(error)
 			return value, err
 		}
@@ -101,20 +100,14 @@ func (c *CombinedExchange) CallMethod(methodName string, paramBytes ...[]byte) (
 	return nil, fmt.Errorf("Method %s not found", methodName)
 }
 
-func (c *CombinedExchange) Exhange_Rate(first []byte, second []byte) ([]byte, error) {
+func (c *CombinedExchange) Exhange_Rate(first string, second string) (float64, error) {
 	res1, _ := c.CurrencyConversionApi.CallMethod("Exhange_Rate", first, second)
 	res2, _ := c.CurrencyExchangeApi.CallMethod("Exhange_Rate", first, second)
 	res3, _ := c.ExchangeRateApi.CallMethod("Exhange_Rate", first, second)
 
-	rate1, _ := strconv.ParseFloat(string(res1), 64)
-	rate2, _ := strconv.ParseFloat(string(res2), 64)
-	rate3, _ := strconv.ParseFloat(string(res3), 64)
+	average := (res1.(float64) + res2.(float64) + res3.(float64)) / 3
 
-	average := (rate1 + rate2 + rate3) / 3
-
-	floatString := strconv.FormatFloat(average, 'f', -1, 64)
-
-	return []byte(floatString), nil
+	return average, nil
 }
 
 func loadPlugin(path string) (plugins.IPlugin, error) {

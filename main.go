@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/binary"
 	"fmt"
 	"math/big"
 	"oracle-test/plugins"
@@ -9,6 +8,20 @@ import (
 )
 
 func main() {
+
+	// mathapi api
+	mathapi, err := loadPlugin("build/plugins/mathapi.so")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	var first uint64 = 123
+	var second uint64 = 123
+
+	res, err := mathapi.CallMethod("Add_Numbers", first, second)
+	fmt.Println("Add_Numbers:", res.(uint64))
+
 	// combined api
 	exchange, err := loadPlugin("build/plugins/combinedexhcnagerate.so")
 	if err != nil {
@@ -19,29 +32,12 @@ func main() {
 	exchange.Initialize()
 	methods := exchange.GetMethods()
 	fmt.Println(methods)
-	res, err := exchange.CallMethod("Exhange_Rate", []byte("USD"), []byte("EUR"))
+	res, err = exchange.CallMethod("Exhange_Rate", "USD", "EUR")
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	// fmt.Println("Exhange_Rate:", string(res))
-
-	// mathapi api
-	mathapi, err := loadPlugin("build/plugins/mathapi.so")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	var first uint64 = 123
-	firstBytes := make([]byte, 8)
-	binary.BigEndian.PutUint64(firstBytes, first)
-	var second uint64 = 123
-	secondBytes := make([]byte, 8)
-	binary.BigEndian.PutUint64(secondBytes, second)
-
-	res, err = mathapi.CallMethod("Add_Numbers", firstBytes, secondBytes)
-	fmt.Println("Add_Numbers:", binary.BigEndian.Uint64(res))
+	// fmt.Println("Exhange_Rate:", res)
 
 	// livescore api
 	sportsdb, err := loadPlugin("build/plugins/livescore.so")
@@ -56,9 +52,9 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-	// fmt.Println("Get_All_Leagues:", string(res))
+	// fmt.Println("Get_All_Leagues:", res)
 
-	// livescore api
+	// bet365 api
 	bet365, err := loadPlugin("build/plugins/bet365.so")
 	if err != nil {
 		fmt.Println(err)
@@ -71,7 +67,7 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-	fmt.Println("Get_Premiere_League_Quotas:", string(res))
+	fmt.Println("Get_Premiere_League_Quotas:", res)
 
 	// goerli
 	goerli, err := loadPlugin("build/plugins/goerli.so")
@@ -86,7 +82,7 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-	// fmt.Println("Eth_blockNumber: ", binary.BigEndian.Uint64(res))
+	fmt.Println("Eth_blockNumber: ", res)
 
 	blockNumberBytes := big.NewInt(1000000).Bytes()
 	res, err = goerli.CallMethod("Eth_getBlockByNumber", blockNumberBytes)
@@ -94,7 +90,7 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-	// fmt.Println("Eth_getBlockByNumber: ", res)
+	fmt.Println("Eth_getBlockByNumber: ", res)
 }
 
 func loadPlugin(path string) (plugins.IPlugin, error) {

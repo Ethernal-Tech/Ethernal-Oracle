@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"oracle-test/plugins"
 	"reflect"
 )
@@ -48,8 +49,30 @@ func (b *BestApi) GetMethods() []plugins.Method {
 	return methods
 }
 
-func (b *BestApi) CallMethod(methodName string, paramBytes ...[]byte) ([]byte, error) {
-	return []byte("Hello from BestAPI"), nil
+func (b *BestApi) CallMethod(methodName string, params ...interface{}) (interface{}, error) {
+	methodValue := reflect.ValueOf(b).MethodByName(methodName)
+
+	if methodValue.IsValid() {
+		var methodParams []reflect.Value
+		for _, param := range params {
+			methodParams = append(methodParams, reflect.ValueOf(param))
+		}
+
+		result := methodValue.Call(methodParams)
+
+		if len(result) > 0 {
+			value, _ := result[0].Interface().(interface{})
+			err, _ := result[1].Interface().(error)
+			return value, err
+		}
+		return nil, fmt.Errorf("Method %s did not return expected values", methodName)
+	}
+
+	return nil, fmt.Errorf("Method %s not found", methodName)
+}
+
+func (b *BestApi) SayHello() (string, error) {
+	return "Hello from BestAPI", nil
 }
 
 func main() {}

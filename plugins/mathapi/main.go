@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/binary"
 	"fmt"
 	"oracle-test/plugins"
 	"reflect"
@@ -50,19 +49,19 @@ func (m *MathApi) GetMethods() []plugins.Method {
 	return methods
 }
 
-func (m *MathApi) CallMethod(methodName string, paramBytes ...[]byte) ([]byte, error) {
+func (m *MathApi) CallMethod(methodName string, params ...interface{}) (interface{}, error) {
 	methodValue := reflect.ValueOf(m).MethodByName(methodName)
 
 	if methodValue.IsValid() {
 		var methodParams []reflect.Value
-		for _, param := range paramBytes {
+		for _, param := range params {
 			methodParams = append(methodParams, reflect.ValueOf(param))
 		}
 
 		result := methodValue.Call(methodParams)
 
 		if len(result) > 0 {
-			value, _ := result[0].Interface().([]uint8)
+			value, _ := result[0].Interface().(interface{})
 			err, _ := result[1].Interface().(error)
 			return value, err
 		}
@@ -72,16 +71,10 @@ func (m *MathApi) CallMethod(methodName string, paramBytes ...[]byte) ([]byte, e
 	return nil, fmt.Errorf("Method %s not found", methodName)
 }
 
-func (m *MathApi) Add_Numbers(first []byte, second []byte) ([]byte, error) {
+func (m *MathApi) Add_Numbers(first uint64, second uint64) (uint64, error) {
+	var added = first + second
 
-	firstNum := binary.BigEndian.Uint64(first)
-	secondNum := binary.BigEndian.Uint64(second)
-	var added = firstNum + secondNum
-
-	bytes := make([]byte, 8)
-	binary.BigEndian.PutUint64(bytes, added)
-
-	return bytes, nil
+	return added, nil
 }
 
 func main() {}

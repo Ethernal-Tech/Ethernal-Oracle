@@ -4,7 +4,6 @@ use (
 	.
 	./plugins/bestapi
 	./plugins/bet365
-	./plugins/bet365_old
 	./plugins/combinedexhcnagerate
 	./plugins/currencyconversionapi
 	./plugins/currencyexchangeapi
