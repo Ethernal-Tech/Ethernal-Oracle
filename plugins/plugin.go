@@ -13,12 +13,8 @@ type IPlugin interface {
 
 type Method struct {
 	MethodName   string
-	InputParams  []Param
-	OutputParams []Param
-}
-
-type Param struct {
-	ParamType reflect.Type
+	InputParams  []reflect.Type
+	OutputParams []reflect.Type
 }
 
 func DefaulGetMethods(structPointer interface{}) []Method {
@@ -35,21 +31,18 @@ func DefaulGetMethods(structPointer interface{}) []Method {
 		}
 
 		numInMethods := method.Type.NumIn()
-		var inParams []Param
+		var inParams []reflect.Type
 
-		for j := 0; j < numInMethods; j++ {
-			inParams = append(inParams, Param{
-				ParamType: method.Type.In(j),
-			})
+		// Skip default struct param
+		for j := 1; j < numInMethods; j++ {
+			inParams = append(inParams, method.Type.In(j))
 		}
 
 		numOutMethods := method.Type.NumOut()
-		var outParams []Param
+		var outParams []reflect.Type
 
 		for j := 0; j < numOutMethods; j++ {
-			outParams = append(outParams, Param{
-				ParamType: method.Type.Out(j),
-			})
+			outParams = append(outParams, method.Type.Out(j))
 		}
 
 		methods = append(methods, Method{

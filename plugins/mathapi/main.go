@@ -4,13 +4,9 @@ import (
 	"oracle-test/plugins"
 )
 
-type MathApi struct {
-	addition uint64
-}
+type MathApi struct{}
 
-func (m *MathApi) Initialize() {
-	m.addition = 1235463
-}
+func (m *MathApi) Initialize() {}
 
 func (m *MathApi) GetMethods() []plugins.Method {
 	return plugins.DefaulGetMethods(m)
