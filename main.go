@@ -7,6 +7,16 @@ import (
 )
 
 func main() {
+	var res interface{}
+	var err error
+
+	var pm = plugins.PluginManager{}
+	pm.InitializePlugins()
+
+	res, _ = pm.CallMethod("Add_Numbers", uint64(123), uint64(321))
+	fmt.Println(res)
+
+	return
 
 	// mathapi api
 	mathapi, err := loadPlugin("build/plugins/mathapi.so")
@@ -16,8 +26,8 @@ func main() {
 	}
 
 	mathapi.Initialize()
-	fmt.Println(mathapi.GetMethods())
-	res, err := mathapi.CallMethod("Add_Numbers", uint64(123), uint64(123))
+	fmt.Println(plugins.DefaultGetMethods(mathapi))
+	res, err = plugins.DefaultCallMethod(mathapi, "Add_Numbers", uint64(123), uint64(321))
 	fmt.Println("Add_Numbers:", res.(uint64))
 
 	// combined api
@@ -28,7 +38,7 @@ func main() {
 	}
 
 	exchange.Initialize()
-	fmt.Println(exchange.GetMethods())
+	fmt.Println(plugins.DefaultGetMethods(exchange))
 	// res, err = exchange.CallMethod("Exhange_Rate", "USD", "EUR")
 	// if err != nil {
 	// 	fmt.Println(err)
@@ -44,7 +54,7 @@ func main() {
 	}
 
 	sportsdb.Initialize()
-	fmt.Println(sportsdb.GetMethods())
+	fmt.Println(plugins.DefaultGetMethods(sportsdb))
 	// res, err = sportsdb.CallMethod("Get_All_Leagues")
 	// if err != nil {
 	// 	fmt.Println(err)
@@ -60,7 +70,7 @@ func main() {
 	}
 
 	bet365.Initialize()
-	fmt.Println(bet365.GetMethods())
+	fmt.Println(plugins.DefaultGetMethods(bet365))
 	// res, err = bet365.CallMethod("Get_Premier_League_Quotas")
 	// if err != nil {
 	// 	fmt.Println(err)
@@ -76,7 +86,7 @@ func main() {
 	}
 
 	goerli.Initialize()
-	fmt.Println(goerli.GetMethods())
+	fmt.Println(plugins.DefaultGetMethods(goerli))
 	// res, err = goerli.CallMethod("Eth_blockNumber")
 	// if err != nil {
 	// 	fmt.Println(err)

@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"log"
+	"fmt"
 	"math/big"
 	"oracle-test/plugins"
 	"os"
@@ -32,17 +32,19 @@ type Goerli struct {
 	address string
 }
 
-func (g *Goerli) Initialize() {
+func (g *Goerli) Initialize() error {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		return fmt.Errorf("Error loading .env file %v", err)
 	}
 
 	g.address = os.Getenv("GOERLI_NODE_URL")
+
+	return nil
 }
 
-func (g *Goerli) GetMethods() []plugins.Method {
-	return plugins.DefaulGetMethods(g)
+func (g *Goerli) GetMethods() ([]plugins.Method, error) {
+	return plugins.DefaultGetMethods(g)
 }
 
 func (g *Goerli) CallMethod(methodName string, params ...interface{}) (interface{}, error) {
@@ -52,13 +54,11 @@ func (g *Goerli) CallMethod(methodName string, params ...interface{}) (interface
 func (g *Goerli) Eth_blockNumber() (uint64, error) {
 	client, err := ethclient.Dial(g.address)
 	if err != nil {
-		log.Fatal(err)
 		return 0, err
 	}
 
 	blockNumber, err := client.BlockNumber(context.Background())
 	if err != nil {
-		log.Fatal(err)
 		return 0, err
 	}
 
@@ -71,13 +71,11 @@ func (g *Goerli) Eth_getBlockByNumber(params []byte) ([]byte, error) {
 
 	client, err := ethclient.Dial(g.address)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
 	block, err := client.BlockByNumber(context.Background(), blockNumber)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
@@ -101,7 +99,6 @@ func (g *Goerli) Eth_getBlockByNumber(params []byte) ([]byte, error) {
 
 	blockInfoJSON, err := json.Marshal(blockInfo)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 

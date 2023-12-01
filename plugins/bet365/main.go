@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"oracle-test/plugins"
 	"os"
@@ -104,18 +103,20 @@ type LiveScore struct {
 	address string
 }
 
-func (s *LiveScore) Initialize() {
+func (s *LiveScore) Initialize() error {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		return fmt.Errorf("Error loading .env file %v", err)
 	}
 
 	s.address = os.Getenv("BET365_ADDRESS")
 	s.api_key = os.Getenv("BET365_API_KEY")
+
+	return nil
 }
 
-func (s *LiveScore) GetMethods() []plugins.Method {
-	return plugins.DefaulGetMethods(s)
+func (s *LiveScore) GetMethods() ([]plugins.Method, error) {
+	return plugins.DefaultGetMethods(s)
 }
 
 func (s *LiveScore) CallMethod(methodName string, params ...interface{}) (interface{}, error) {

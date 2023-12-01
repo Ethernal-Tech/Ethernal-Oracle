@@ -6,10 +6,12 @@ import (
 
 type MathApi struct{}
 
-func (m *MathApi) Initialize() {}
+func (m *MathApi) Initialize() error {
+	return nil
+}
 
-func (m *MathApi) GetMethods() []plugins.Method {
-	return plugins.DefaulGetMethods(m)
+func (m *MathApi) GetMethods() ([]plugins.Method, error) {
+	return plugins.DefaultGetMethods(m)
 }
 
 func (m *MathApi) CallMethod(methodName string, params ...interface{}) (interface{}, error) {

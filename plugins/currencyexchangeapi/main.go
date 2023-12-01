@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"oracle-test/plugins"
 	"os"
@@ -17,18 +16,20 @@ type CurrencyExchangeApi struct {
 	address string
 }
 
-func (e *CurrencyExchangeApi) Initialize() {
+func (e *CurrencyExchangeApi) Initialize() error {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		return fmt.Errorf("Error loading .env file %v", err)
 	}
 
 	e.address = os.Getenv("CURRENCY_EXCHANGE_ADDRESS")
 	e.api_key = os.Getenv("CURRENCY_EXCHANGE_API_KEY")
+
+	return nil
 }
 
-func (e *CurrencyExchangeApi) GetMethods() []plugins.Method {
-	return plugins.DefaulGetMethods(e)
+func (e *CurrencyExchangeApi) GetMethods() ([]plugins.Method, error) {
+	return plugins.DefaultGetMethods(e)
 }
 
 func (e *CurrencyExchangeApi) CallMethod(methodName string, params ...interface{}) (interface{}, error) {

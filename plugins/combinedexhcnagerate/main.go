@@ -12,34 +12,33 @@ type CombinedExchange struct {
 	ExchangeRateApi       plugins.IPlugin
 }
 
-func (c *CombinedExchange) Initialize() {
+func (c *CombinedExchange) Initialize() error {
 	var err error
 
 	c.CurrencyConversionApi, err = loadPlugin("build/plugins/exchangerateapi.so")
 	if err != nil {
-		fmt.Println(err)
-		return
+		return fmt.Errorf("Error loading ExchangeRateAPI %v", err)
 	}
 
 	c.CurrencyExchangeApi, err = loadPlugin("build/plugins/currencyexchangeapi.so")
 	if err != nil {
-		fmt.Println(err)
-		return
+		return fmt.Errorf("Error loading CurrencyExchangeAPI %v", err)
 	}
 
 	c.ExchangeRateApi, err = loadPlugin("build/plugins/currencyconversionapi.so")
 	if err != nil {
-		fmt.Println(err)
-		return
+		return fmt.Errorf("Error loading CurrencyConversionAPI %v", err)
 	}
 
 	c.CurrencyConversionApi.Initialize()
 	c.CurrencyExchangeApi.Initialize()
 	c.ExchangeRateApi.Initialize()
+
+	return nil
 }
 
-func (c *CombinedExchange) GetMethods() []plugins.Method {
-	return plugins.DefaulGetMethods(c)
+func (c *CombinedExchange) GetMethods() ([]plugins.Method, error) {
+	return plugins.DefaultGetMethods(c)
 }
 
 func (c *CombinedExchange) CallMethod(methodName string, params ...interface{}) (interface{}, error) {

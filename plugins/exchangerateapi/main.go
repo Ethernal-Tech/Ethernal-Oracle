@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"oracle-test/plugins"
 	"os"
@@ -30,18 +29,20 @@ type ExchangeRateApi struct {
 	address string
 }
 
-func (e *ExchangeRateApi) Initialize() {
+func (e *ExchangeRateApi) Initialize() error {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		return fmt.Errorf("Error loading .env file %v", err)
 	}
 
 	e.address = os.Getenv("EXCHANGE_RATE_ADDRESS")
 	e.api_key = os.Getenv("EXCHANGE_RATE_API_KEY")
+
+	return nil
 }
 
-func (e *ExchangeRateApi) GetMethods() []plugins.Method {
-	return plugins.DefaulGetMethods(e)
+func (e *ExchangeRateApi) GetMethods() ([]plugins.Method, error) {
+	return plugins.DefaultGetMethods(e)
 }
 
 func (e *ExchangeRateApi) CallMethod(methodName string, params ...interface{}) (interface{}, error) {

@@ -6,10 +6,12 @@ import (
 
 type BestApi struct{}
 
-func (b *BestApi) Initialize() {}
+func (b *BestApi) Initialize() error {
+	return nil
+}
 
-func (b *BestApi) GetMethods() []plugins.Method {
-	return plugins.DefaulGetMethods(b)
+func (b *BestApi) GetMethods() ([]plugins.Method, error) {
+	return plugins.DefaultGetMethods(b)
 }
 
 func (b *BestApi) CallMethod(methodName string, params ...interface{}) (interface{}, error) {

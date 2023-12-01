@@ -6,8 +6,8 @@ import (
 )
 
 type IPlugin interface {
-	Initialize()
-	GetMethods() []Method
+	Initialize() error
+	GetMethods() ([]Method, error)
 	CallMethod(methodName string, params ...interface{}) (interface{}, error)
 }
 
@@ -17,8 +17,11 @@ type Method struct {
 	OutputParams []reflect.Type
 }
 
-func DefaulGetMethods(structPointer interface{}) []Method {
+func DefaultGetMethods(structPointer interface{}) ([]Method, error) {
 	structType := reflect.TypeOf(structPointer)
+	if structType == nil {
+		return nil, fmt.Errorf("Failed to get type of a struct")
+	}
 
 	numMethods := structType.NumMethod()
 	var methods []Method
@@ -27,14 +30,14 @@ func DefaulGetMethods(structPointer interface{}) []Method {
 		method := structType.Method(i)
 
 		if IsIPluginMethod(method.Name) {
+			// Skip IPlugin methods
 			continue
 		}
 
 		numInMethods := method.Type.NumIn()
 		var inParams []reflect.Type
 
-		// Skip default struct param
-		for j := 1; j < numInMethods; j++ {
+		for j := 0; j < numInMethods; j++ {
 			inParams = append(inParams, method.Type.In(j))
 		}
 
@@ -52,7 +55,7 @@ func DefaulGetMethods(structPointer interface{}) []Method {
 		})
 	}
 
-	return methods
+	return methods, nil
 }
 
 func DefaultCallMethod(structPointer interface{}, methodName string, params ...interface{}) (interface{}, error) {
